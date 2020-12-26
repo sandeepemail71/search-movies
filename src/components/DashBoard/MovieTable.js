@@ -1,21 +1,33 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
-import { Input, Row, Col } from 'reactstrap';
+import {
+    Input, Row, Col, Dropdown, DropdownToggle, DropdownMenu,
+    DropdownItem
+} from 'reactstrap';
 import { callApi } from '../../api';
 
+const uniqueLanguages = (languages) => {
+    const uniqueLanguagesSet = new Set(languages);
+    return Array.from(uniqueLanguagesSet)
+}
 
-function MovieTable(props) {
+function Recommendation(props) {
     const [moviesArr, setmoviesArr] = useState([]);
     const [totalResult, settotalResult] = useState(0);
+    const [language, setLanguage] = useState([]);
     const [page, setPage] = useState(1);
+    const [dropDownOpen, setDropdown] = useState(false);
+    const [slectedLanguage, setSlectedLanguage] = useState('');
 
     useEffect(() => {
         callApi(`/3/movie/upcoming?page=${page}`, 'GET', null)
             .then(resp => {
                 setmoviesArr(resp.results);
                 settotalResult(resp.total_pages * 20);
+                const languages = uniqueLanguages(resp.results.map(ele => ele.original_language));
+                setLanguage(languages);
             });
-    }, []);
+    }, [slectedLanguage]);
 
 
     const pageChangeHandler = (pageNumber) => {
@@ -24,75 +36,25 @@ function MovieTable(props) {
             callApi(`/3/movie/upcoming?page=${page}`, 'GET', null)
                 .then(resp => {
                     setmoviesArr(resp.results);
+                    const languages = resp.results.map(ele => ele.original_language);
+                    setLanguage(languages);
                 });
         }
     }
 
-    const options = {
-        page,
-        pageStartIndex: 1,
-        sizePerPage: 20,
-        onPageChange: pageChangeHandler,
-        paginationPosition: "bottom",
-        noDataText: 'There is no data to display',
-        paginationPosition: "bottom",
-        hideSizePerPage: true
-    };
-
-    const columns = [
-        {
-            dataField: "original_title",
-            text: "Original Title"
-        },
-        {
-            dataField: "original_language",
-            text: "Original Language",
-        },
-        {
-            dataField: "vote_average",
-            text: "Vote Average"
-        },
-    ]
+  
+    const toggle = (ele) => {
+        setDropdown(!dropDownOpen);
+    }
 
     return (
         <React.Fragment>
-            <Row className='my-3 flex-row-reverse'>
-                <Col md={4}>
-                    <Input />
-                </Col>
-            </Row>
-            <BootstrapTable
-                keyField='id'
-                data={moviesArr}
-                remote={true}
-                columns={columns}
-                pagination={true}
-                options={options}
-                fetchInfo={{
-                    dataTotalSize: totalResult
-                }}
-                condensed
-                striped
-                bodyStyle={{ overflowY: 'scroll' }}
-                maxHeight={`${window.screen.height - 270}px`}
-                hover
-            >
-                {
-                    columns.map(ele => (
-                        <TableHeaderColumn
-                            key={ele.id}
-                            dataField={ele.dataField}
-                        >
-                            {ele.text}
-                        </TableHeaderColumn>
-                    ))
-                }
-            </BootstrapTable>
+            
         </React.Fragment>
     );
 }
 
-export default MovieTable;
+export default Recommendation;
 
 
 

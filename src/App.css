@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  background: #0f171e
 }
 
 .App-logo {
@@ -26,6 +27,18 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.dashBoard {
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
+@media screen and (max-width: 600px) {
+  .dashBoard {
+    margin-left: 5px;
+    margin-right: 5px;
+  }
 }
 
 @keyframes App-logo-spin {
